@@ -1,4 +1,5 @@
 ## Introduce
+[中文文档](https://github.com/osgochina/image2webp/blob/master/README-cn.md)
 
 The Image2webp project is an application written with golang that supports real-time transcoding of multiple image formats into webp images.
 
