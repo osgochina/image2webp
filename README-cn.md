@@ -46,6 +46,12 @@
 `image2webp` 部署也是很方便的，只需要把编译的二进制文件直接放到服务器上去运行，
 再配置一下前端代理，具体可以参考`nginx.conf`。
 
+部署好后的效果如下：
+
+* 原图片地址: `http://image.example.com/images/timg.jpeg`
+* webp格式图片地址: `http://image.example.com/images/timg.jpeg_webp`
+* webp缩略图格式地址: `http://image.example.com/images/timg.jpeg_webp_100_100`
+
 ### 感谢
 
 * 本项目是基于[Go Frame](https://github.com/gogf/gf)框架开发.

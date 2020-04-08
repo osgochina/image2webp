@@ -23,8 +23,6 @@ const ImageJpeg int = 1
 const ImagePng int = 2
 const ImageBmp int = 3
 const ImageGif int = 4
-const DefaultMaxWidth float64 = 960
-const DefaultMaxHeight float64 = 3000
 
 type Image struct {
 	FilePath  string
@@ -113,8 +111,8 @@ func (that *Image) gitToWebP(gifBin []byte, quality float32) (webPBin []byte, er
 }
 
 // 计算图片缩放后的尺寸
-func (that *Image) calculateRatioFit(srcWidth, srcHeight int) (int, int) {
-	ratio := math.Min(DefaultMaxWidth/float64(srcWidth), DefaultMaxHeight/float64(srcHeight))
+func (that *Image) calculateRatioFit(srcWidth, srcHeight int, desWidth, desHeight int) (int, int) {
+	ratio := math.Min(float64(desWidth)/float64(srcWidth), float64(desHeight)/float64(srcHeight))
 	return int(math.Ceil(float64(srcWidth) * ratio)), int(math.Ceil(float64(srcHeight) * ratio))
 }
 
@@ -122,18 +120,31 @@ func (that *Image) calculateRatioFit(srcWidth, srcHeight int) (int, int) {
 创建缩略图
 */
 func (that *Image) MakeThumbnail(width int, height int) (out []byte, err error) {
-	w, h := that.calculateRatioFit(width, height)
+
 	var img image.Image
+	var desWidth int
+	var desHeight int
+
 	reader := bytes.NewReader(that.Data)
+	reader2 := bytes.NewReader(that.Data)
 	switch that.ImageType {
 	case ImageJpeg:
 		img, _ = jpeg.Decode(reader)
+		img2, _ := jpeg.DecodeConfig(reader2)
+		desWidth = img2.Width
+		desHeight = img2.Height
 		break
 	case ImagePng:
 		img, _ = png.Decode(reader)
+		img2, _ := png.DecodeConfig(reader2)
+		desWidth = img2.Width
+		desHeight = img2.Height
 		break
 	case ImageBmp:
 		img, _ = bmp.Decode(reader)
+		img2, _ := bmp.DecodeConfig(reader2)
+		desWidth = img2.Width
+		desHeight = img2.Height
 		break
 	case ImageGif:
 		gifData, err := that.resizeGif(width, height)
@@ -147,6 +158,7 @@ func (that *Image) MakeThumbnail(width int, height int) (out []byte, err error) 
 		err = errors.New(msg)
 		return nil, err
 	}
+	w, h := that.calculateRatioFit(desWidth, desHeight, width, height)
 	var buf bytes.Buffer
 	m := resize.Resize(uint(w), uint(h), img, resize.Lanczos3)
 	if err = webp.Encode(&buf, m, &webp.Options{Lossless: false, Quality: 100}); err != nil {
