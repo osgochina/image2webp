@@ -1,7 +1,9 @@
 {
   "addr": "127.0.0.1:8563",
-  "storagePath": "/home/liuzhiming/golang/imagetowebp",
+  "storagePath": "./images",
   "quality": 80,
+  "enableTmpFile": true,
+  "tmpStoragePath": "/tmp/image2webp",
   "allowSizes": [
     "_50_50",
     "_100_100",

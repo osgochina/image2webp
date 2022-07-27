@@ -20,16 +20,16 @@ Set the CDN image cache expiration date a little longer, the service is only use
 
 ## Compile
 
-Compilation is very simple, make sure your go version is `1.14` and above, and turn on support for `mod`.
+Compilation is very simple, make sure your go version is `1.15` and above, and turn on support for `mod`.
 
 Execute the `make` command and it will compile automatically.
 Of course, you can also manually execute the full path compiler command.
 ```shell script
- go build -v -o builds/image2webp
+$ go build -v -o image2webp
 ```
 After compiling successfully, you can execute
 ```shell script
-./builds/image2webp -f config.json
+$ ./image2webp start --config=./config.json
 ```
 To start it.
 

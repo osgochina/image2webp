@@ -19,16 +19,16 @@
 
 ## 编译
 
-编译是非常简单的，确保你的go版本是`1.14`以上，并且打开了`mod`的支持。
+编译是非常简单的，确保你的go版本是`1.15`以上，并且打开了`mod`的支持。
 
 执行`make` 命令就自动编译好了.
 当然你也可以手动执行全路径编译命令
 ```shell script
- go build -v -o builds/image2webp
+$ go build -v -o image2webp
 ```
 编译成功后，你可以执行 
 ```shell script
-./builds/image2webp -f config.json
+$ ./image2webp start --config=./config.json
 ```
 启动它
 
@@ -40,6 +40,8 @@
 * storagePath 图片存储的目录
 * quality 转码成webp时的图片质量百分比 默认是80%
 * allowSizes  支持的缩略图格式,_50_50: _width_height
+* enableTmpFile  开启图片缓存
+* tmpStoragePath  图片缓存的目录
 
 ## 部署
 

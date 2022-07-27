@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"bytes"
@@ -23,6 +23,7 @@ const ImageJpeg int = 1
 const ImagePng int = 2
 const ImageBmp int = 3
 const ImageGif int = 4
+const ImageWebp int = 5
 
 type Image struct {
 	FilePath  string
@@ -33,9 +34,7 @@ type Image struct {
 	Height    int
 }
 
-/**
-打开图片文件
-*/
+// Open /**
 func (that *Image) Open(filePath string) (err error) {
 	that.FilePath = filePath
 	that.Data = gfile.GetBytes(filePath)
@@ -49,6 +48,8 @@ func (that *Image) Open(filePath string) (err error) {
 		that.ImageType = ImageBmp
 	} else if strings.Contains(contentType, "gif") {
 		that.ImageType = ImageGif
+	} else if strings.Contains(contentType, "webp") {
+		that.ImageType = ImageWebp
 	}
 	reader := bytes.NewReader(that.Data)
 	img, _, err := image.Decode(reader)
@@ -61,24 +62,32 @@ func (that *Image) Open(filePath string) (err error) {
 	return nil
 }
 
-/**
-图片转webP
-*/
+func (that *Image) Reset() {
+	that.Data = nil
+}
+
+// ToWebP /**
 func (that *Image) ToWebP(quality float32) (out []byte, err error) {
 	var img image.Image
 	reader := bytes.NewReader(that.Data)
+	lossLess := false //是否无损压缩
+	Exact := false    //透明部分消失
 	switch that.ImageType {
 	case ImageJpeg:
 		img, _ = jpeg.Decode(reader)
 		break
 	case ImagePng:
 		img, _ = png.Decode(reader)
+		lossLess = true
+		Exact = true
 		break
 	case ImageBmp:
 		img, _ = bmp.Decode(reader)
 		break
 	case ImageGif:
 		return that.gitToWebP(that.Data, quality)
+	case ImageWebp:
+		return that.Data, nil
 	}
 	if img == nil {
 		msg := "image file " + that.FilePath + " is corrupted or not supported"
@@ -86,7 +95,7 @@ func (that *Image) ToWebP(quality float32) (out []byte, err error) {
 		return nil, err
 	}
 	var buf bytes.Buffer
-	if err = webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: quality}); err != nil {
+	if err = webp.Encode(&buf, img, &webp.Options{Lossless: lossLess, Exact: Exact, Quality: quality}); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
@@ -116,15 +125,14 @@ func (that *Image) calculateRatioFit(srcWidth, srcHeight int, desWidth, desHeigh
 	return int(math.Ceil(float64(srcWidth) * ratio)), int(math.Ceil(float64(srcHeight) * ratio))
 }
 
-/**
-创建缩略图
-*/
-func (that *Image) MakeThumbnail(width int, height int) (out []byte, err error) {
+// MakeThumbnail /**
+func (that *Image) MakeThumbnail(width int, height int, quality float32) (out []byte, err error) {
 
 	var img image.Image
 	var desWidth int
 	var desHeight int
-
+	lossLess := false //是否无损压缩
+	Exact := false    //透明部分消失
 	reader := bytes.NewReader(that.Data)
 	reader2 := bytes.NewReader(that.Data)
 	switch that.ImageType {
@@ -139,6 +147,8 @@ func (that *Image) MakeThumbnail(width int, height int) (out []byte, err error) 
 		img2, _ := png.DecodeConfig(reader2)
 		desWidth = img2.Width
 		desHeight = img2.Height
+		lossLess = true
+		Exact = true
 		break
 	case ImageBmp:
 		img, _ = bmp.Decode(reader)
@@ -151,7 +161,12 @@ func (that *Image) MakeThumbnail(width int, height int) (out []byte, err error) 
 		if err != nil {
 			return nil, err
 		}
-		return that.gitToWebP(gifData, 100)
+		return that.gitToWebP(gifData, quality)
+	case ImageWebp:
+		img, _ = webp.Decode(reader)
+		desWidth = that.Width
+		desHeight = that.Height
+		break
 	}
 	if img == nil {
 		msg := "image file " + that.FilePath + " is corrupted or not supported"
@@ -161,7 +176,7 @@ func (that *Image) MakeThumbnail(width int, height int) (out []byte, err error) 
 	w, h := that.calculateRatioFit(desWidth, desHeight, width, height)
 	var buf bytes.Buffer
 	m := resize.Resize(uint(w), uint(h), img, resize.Lanczos3)
-	if err = webp.Encode(&buf, m, &webp.Options{Lossless: false, Quality: 100}); err != nil {
+	if err = webp.Encode(&buf, m, &webp.Options{Lossless: lossLess, Exact: Exact, Quality: quality}); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
