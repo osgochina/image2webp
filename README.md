@@ -47,8 +47,9 @@ To start it.
 `image2webp` deployment is also very convenient, just need to put the compiled binaries directly on the server to run,
 Then configure the front - end proxy, you can refer to `nginx.conf`.
 
-### Thanks
+## Thanks
 
+* This project is based on the [DMicro](https://github.com/osgochina/dmicro) framework.
 * This project is based on the [Go Frame](https://github.com/gogf/gf) framework.
 * Refer to the project [webp_server_go](https://github.com/webp-sh/webp_server_go)
 * Thank you for providing a variety of image conversion library project, you can see the source library reference.

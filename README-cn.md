@@ -13,8 +13,8 @@
 本项目的最佳实现是在图片服务器中启动本服务，在nginx或者其他web服务器中配置转发，
 只需要匹配`^(.+)_webp(_(\d+)_(\d+)(.*))?$` 这个url格式就能转发到image2webp程序中,从而输出webp格式的图片。
 
-如果是前端访问图片，在请求量很大的时候，这种实时转码的方式会造成cpu性能不足，所以针对大请求量的请看，前面必须使用cdn档一下。
-
+如果是前端访问图片，在请求量很大的时候，这种实时转码的方式会造成cpu性能不足，所以针对大请求量的情况，
+可以选择开启缓存，设置缓存目录，生成的webp文件会写入该目录。
 把cdn图片缓存有效期设置的长一点，本服务只是回源使用，那样就很完美了。
 
 ## 编译
@@ -54,8 +54,9 @@ $ ./image2webp start --config=./config.json
 * webp格式图片地址: `http://image.example.com/images/timg.jpeg_webp`
 * webp缩略图格式地址: `http://image.example.com/images/timg.jpeg_webp_100_100`
 
-### 感谢
+## 感谢
 
+* 本项目是基于[DMicro](https://gitee.com/osgochina/dmicro)框架开发.
 * 本项目是基于[Go Frame](https://github.com/gogf/gf)框架开发.
 * 参考项目[webp_server_go](https://github.com/webp-sh/webp_server_go)
 * 感谢提供了各种图片转换库的项目，大家可以看源码库的引用。
