@@ -14,7 +14,7 @@ import (
 )
 
 type App struct {
-	dserver.BaseSandbox
+	dserver.ServiceSandbox
 	svr            *ghttp.Server
 	quality        float32
 	allowSizes     *garray.StrArray

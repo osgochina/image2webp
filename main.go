@@ -12,7 +12,7 @@ const (
 )
 
 func main() {
-	dserver.CloseCtrl()
+	dserver.CloseCtl()
 	dserver.Authors = "ClownFish"
 	dserver.BuildVersion = VERSION
 	dserver.SetName("image2webp")
